@@ -4,21 +4,20 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import postRoutes from './routes/posts.js';
 import dotenv from 'dotenv';
-
+import userRouter from "./routes/users.js";
 
 const app = express();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cors());
 app.use('/posts', postRoutes);
+app.use("/user", userRouter);
 dotenv.config();
 
-const con_url = 'mongodb+srv://My-proj:vLdrF9ZcEHqeSaG@myproj.bqul5.mongodb.net/QuickShare?retryWrites=true&w=majority'
-const PORT = process.env.PORT || 8000
+const con_url = 'mongodb+srv://My-proj:vLdrF9ZcEHqeSaG@myproj.bqul5.mongodb.net/Quickkkkkshareeeeee?retryWrites=true&w=majority'
+const PORT = process.env.PORT || 7000
 
-if(process.env.NODE_ENV=="production"){
-    app.use(express.static("client/build"));
-}
+
 mongoose.connect(process.env.con_url,
     {
         useNewUrlParser: true,
