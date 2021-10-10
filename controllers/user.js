@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import UserModal from "../models/user.js";
+import LoginModal from "../models/loginUsers.js"
 
-const secret = 'suruchilovesmeIlovesuruchisuruchiismydarlingIamdarlingofher';
+const secret = `${process.env.secret_key}`;
 
 export const signin = async (req, res) => {
   const { email, password } = req.body;
@@ -41,6 +42,22 @@ export const signup = async (req, res) => {
     const token = jwt.sign( { email: result.email, id: result._id }, secret, { expiresIn: "1h" } );
 
     res.status(201).json({ result, token });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong" });
+    
+    console.log(error);
+  }
+};
+
+export const loginUser = async (req, res) => {
+  // console.log(req.body);
+  const email = req.body.email;
+  const firstname=req.body.givenName;
+  const lastname=req.body.familyName;
+
+  try {
+   await LoginModal.create({  firstname,lastname,email ,when:Date.now()});
+    res.status(201);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
     

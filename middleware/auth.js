@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 
-const secret = 'suruchilovesmeIlovesuruchisuruchiismydarlingIamdarlingofher';
+const secret = `${process.env.secret_key}`;
 
 const auth = async (req, res, next) => {
   try {
@@ -21,6 +21,7 @@ const auth = async (req, res, next) => {
 
     next();
   } catch (error) {
+    res.status(400).json({message:"You are not allowed !"});
     console.log(error);
   }
 };

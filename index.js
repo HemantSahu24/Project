@@ -9,12 +9,18 @@ import userRouter from "./routes/users.js";
 const app = express();
 app.use(bodyParser.json({ limit: "30mb", extended: true }));
 app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(cors());
+// app.use(cors());
+const corsOptions ={
+    origin:'http://localhost:3000', 
+    credentials:true,            //access-control-allow-credentials:true
+    optionSuccessStatus:200
+}
+app.use(cors(corsOptions));
 app.use('/posts', postRoutes);
 app.use("/user", userRouter);
 dotenv.config();
 
-const con_url = 'mongodb+srv://My-proj:vLdrF9ZcEHqeSaG@myproj.bqul5.mongodb.net/Quickkkkkshareeeeee?retryWrites=true&w=majority'
+
 const PORT = process.env.PORT || 7000
 
 

@@ -14,7 +14,15 @@ export const getPosts = async (req, res) => {
         res.status(404).json({ message: error.message });
     }
 }
-
+export const getPostById= async(req,res)=>{
+     const {id}=req.params;
+     try{
+           const postmsg=await PostMessage.findById(id);
+           res.status(200).json(postmsg);
+     }catch(error){
+        res.status(404).json({ message: error.message });
+     }
+}
 export const getPost = async (req, res) => { 
     const { id } = req.params;
 
@@ -86,5 +94,21 @@ export const likePost = async (req, res) => {
     res.status(200).json(updatedPost);
 }
 
+export const commentPost = async (req, res) => {
+    const { id } = req.params;
+    const { value } = req.body;
+   try{
+    const post = await PostMessage.findById(id);
+
+    post.comments.push(value);
+
+    const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
+
+    res.json(updatedPost);
+   }
+   catch{
+       res.status(400).json({message:"Bad request !"});
+   }
+};
 
 export default router;
