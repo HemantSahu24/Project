@@ -5,6 +5,7 @@ const postSchema = mongoose.Schema({
     message: String,
     name: String,
     creator: String,
+    email:String,
     tags: [String],
     selectedFile: String,
     comments: {type: [String], default: []},
