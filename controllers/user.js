@@ -45,6 +45,7 @@ export const requestOtp = async (req, res) => {
 
 }
 export const signin = async (req, res) => {
+  // console.log(req.body);
   const { email, password } = req.body;
 
   try {
@@ -52,13 +53,17 @@ export const signin = async (req, res) => {
 
     if (!oldUser) return res.status(404).json({ message: "User doesn't exist" });
 
+    // console.log(oldUser.password,password,email);
     const isPasswordCorrect = await bcrypt.compare(password, oldUser.password);
 
-    if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials" });
+    if (isPasswordCorrect) {
+      const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
 
-    const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
-
-    res.status(200).json({ result: oldUser, token });
+      res.status(200).json({ result: oldUser, token });
+    }
+    else {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
   } catch (err) {
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -126,18 +131,48 @@ export const requestOtpLogin = async (req, res) => {
     const oldUser = await UserModal.findOne({ email: req.body.email });
     // console.log(oldUser);
     if (!oldUser) return res.status(400).json({ message: "User doesn't exist" });
-    
+
     var mailOptions = {
       from: 'QuickShare <quickshare56@gmail.com>',
       to: `${req.body.email}`,
       subject: `QuickShare Change Password`,
-      html: `<p>Hi,${oldUser.name}</p> <p> Your OTP for changing password on QuickShare is ${op}.</p>`
+      html: `<p>Hi ${oldUser.name},</p> <p> Your OTP for changing password on QuickShare is ${op}.</p>`
     };
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         res.status(401).send("This email id doesn't exist,try with another")
       } else {
         res.status(200).send(op);
+        console.log('Email sent: ' + info.response);
+      }
+    });
+
+  }
+  catch (error) {
+    res.status(401).send('Something went wrong');
+  }
+}
+
+export const loginviaOTP = async (req, res) => {
+  const op = otpGenerator.generate(4, { alphabets: false, digits: true, upperCase: false, specialChars: false });
+  // console.log(req);
+  try {
+    const oldUser = await UserModal.findOne({ email: req.body.email });
+    // console.log(oldUser);
+    if (!oldUser) return res.status(401).json({ message: "User doesn't exist" });
+
+    var mailOptions = {
+      from: 'QuickShare <quickshare56@gmail.com>',
+      to: `${req.body.email}`,
+      subject: `Login Via OTP`,
+      html: `<p>Hi ${oldUser.name},</p> <p>${op} is your QuickShare verification code.</p>`
+    };
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        res.status(401).send("This email id doesn't exist,try with another")
+      } else {
+        const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
+        res.status(200).json({ token,OneTimePassword: op, UserResult: oldUser });
         console.log('Email sent: ' + info.response);
       }
     });
@@ -156,13 +191,13 @@ export const changePassword = async (req, res) => {
     // console.log(oldUser);
     if (!oldUser) return res.status(404).json({ message: "User doesn't exist" });
 
-    const pass= await bcrypt.hash(password, 12);
+    const pass = await bcrypt.hash(password, 12);
     // console.log(password);
-   const updatedUser= {email:oldUser.email,name:oldUser.name,password:pass}
-   const newUser=await UserModal.findByIdAndUpdate(oldUser._id,updatedUser,{new:true});
-  //  console.log(newUser);
+    const updatedUser = { email: oldUser.email, name: oldUser.name, password: pass }
+    const newUser = await UserModal.findByIdAndUpdate(oldUser._id, updatedUser, { new: true });
+    //  console.log(newUser);
 
-   res.status(200).json(newUser);
+    res.status(200).json(newUser);
   } catch (err) {
     // console.log(err);
     res.status(500).json({ message: "Something went wrong" });
