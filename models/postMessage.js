@@ -5,10 +5,10 @@ const postSchema = mongoose.Schema({
     message: String,
     name: String,
     creator: String,
-    email:String,
+    email: String,
     tags: [String],
     selectedFile: String,
-    comments: {type: [String], default: []},
+    comments: { type: [String], default: [] },
     likes: { type: [String], default: [] },
     createdAt: {
         type: Date,

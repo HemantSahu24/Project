@@ -87,7 +87,7 @@ export const signup = async (req, res) => {
       from: 'QuickShare <quickshare56@gmail.com>',
       to: `${email}`,
       subject: `Welcome To QuickShare`,
-      html: `<p>Hi ${firstName},</p> <p> Thank you for registering on QuickShare.Make memories and start sharing on QuickShare.</p>`
+      html: `<p>Hi ${firstName},</p> <p> Thank you for registering on QuickShare.Create memories and start sharing on QuickShare.</p>`
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -113,7 +113,24 @@ export const loginUser = async (req, res) => {
   const email = req.body.email;
   const firstname = req.body.givenName;
   const lastname = req.body.familyName;
+  const ind= await LoginModal.findOne({email:req.body.email}).exec();
+  // console.log(ind);
+  if(!ind){
+    var mailOptions = {
+      from: 'QuickShare <quickshare56@gmail.com>',
+      to: `${email}`,
+      subject: `Welcome To QuickShare`,
+      html: `<p>Hi ${firstname} ${lastname},</p> <p> QuickShare warmly welcomes you.Create memories and start sharing on QuickShare.</p>`
+    };
 
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+  }
   try {
     await LoginModal.create({ firstname, lastname, email, when: Date.now() });
     res.status(201);
@@ -172,7 +189,7 @@ export const loginviaOTP = async (req, res) => {
         res.status(401).send("This email id doesn't exist,try with another")
       } else {
         const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
-        res.status(200).json({ token,OneTimePassword: op, UserResult: oldUser });
+        res.status(200).json({ token, OneTimePassword: op, UserResult: oldUser });
         console.log('Email sent: ' + info.response);
       }
     });

@@ -100,7 +100,7 @@ export const likePost = async (req, res) => {
       subject: `NOTIFICATION: Someone has liked your post !`,
       html: `<h1>Hey ${post.name} ! </h1><p><h3>${req.target} has liked❤️ your post ! This post has total ${post?.likes?.length} like(s) now.Go to <a href="https://hemant-sahu.netlify.app/${post._id}">your post</a> and check what's happening there ! </h3></p>`
     };
-    
+
     if (post.creator != req.userId) {
       transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
