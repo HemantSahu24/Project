@@ -4,6 +4,7 @@ import otpGenerator from 'otp-generator'
 import UserModal from "../models/user.js";
 import LoginModal from "../models/loginUsers.js"
 import nodemailer from 'nodemailer';
+import Message from '../models/message.js'
 import user from "../models/user.js";
 
 const secret = `${process.env.secret_key}`;
@@ -97,7 +98,8 @@ export const signup = async (req, res) => {
         console.log('Email sent: ' + info.response);
       }
     });
-
+    const id = result._id;
+    await LoginModal.create({ id, firstname: firstName, lastname: lastName, email, when: Date.now() });
     res.status(201).json({ result, token });
 
 
@@ -110,12 +112,13 @@ export const signup = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   // console.log(req.body);
+  const id = req.body.googleId;
   const email = req.body.email;
   const firstname = req.body.givenName;
   const lastname = req.body.familyName;
-  const ind= await LoginModal.findOne({email:req.body.email}).exec();
+  const ind = await LoginModal.findOne({ email: req.body.email }).exec();
   // console.log(ind);
-  if(!ind){
+  if (!ind) {
     var mailOptions = {
       from: 'QuickShare <quickshare56@gmail.com>',
       to: `${email}`,
@@ -132,7 +135,7 @@ export const loginUser = async (req, res) => {
     });
   }
   try {
-    await LoginModal.create({ firstname, lastname, email, when: Date.now() });
+    await LoginModal.create({ id, firstname, lastname, email, when: Date.now() });
     res.status(201);
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
@@ -220,6 +223,94 @@ export const changePassword = async (req, res) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
+export const directPost = async (req, res) => {
+  const data = req.body;
+  // console.log(data);
+  const newMessage = new Message({ ...data, createdAt: new Date().toISOString() })
+
+  try {
+    await newMessage.save();
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    console.log(error);
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const GetDirectPost = async (req, res) => {
+  const data = req.body.conversationId;
+  // console.log(req.body);
+
+  try {
+
+
+    await Message.updateMany({ seen: false, conversationId: data, sender: { $ne: req.body.senderId } }, { $set: { seen: true } }, { new: true });
+    const Messages = await Message.find({ conversationId: data }).exec();
+
+    // console.log(Messages);
+    res.status(201).json(Messages);
+  } catch (error) {
+    console.log(error);
+    res.status(409).json({ message: error.message });
+  }
+}
+
+export const FindUserForChat = async (req, res) => {
+  const { id } = req.body;
+  // console.log(req.body);
+  try {
+    const User = await LoginModal.findOne({ id });
+
+    if (!User) return res.status(400).json({ message: "User doesn't exists" });
+
+    res.status(201).json({ name: `${User.firstname} ${User.lastname}` });
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+export const SendMailToUser = async (req, res) => {
+  const id = req.body.id;
+  const Name = req.body.Name;
+  const msg = req.body.message;
+  const senderId = req.body.senderId;
+  // console.log(req.body);
+  try {
+
+    const User = await LoginModal.findOne({ id });
+
+    if (!User) return res.status(400).json({ message: "User doesn't exists" });
+
+    var mailOptions = {
+      from: 'QuickShare <quickshare56@gmail.com>',
+      to: `${User?.email}`,
+      subject: `Someone sent you a message`,
+      html: `<p>Hi ${User.firstname} ${User.lastname},</p> <p>${Name} sent you a message "${msg}". Click <a href="https://hemant-sahu.netlify.app/direct/${senderId}">here</a> for more details.</p>`
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+
+
 
 
 

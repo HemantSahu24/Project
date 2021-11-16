@@ -4,9 +4,9 @@ const secret = `${process.env.secret_key}`;
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    const isCustomAuth = token.length < 500;
-    const NAME = req.headers.authorization.split(" ")[2];
+    const token = req.headers.authorization?.split(" ")[1];
+    const isCustomAuth = token?.length < 500;
+    const NAME = req.headers.authorization?.split(" ")[2];
     let decodedData;
 
     if (token && isCustomAuth) {
