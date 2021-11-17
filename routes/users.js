@@ -1,10 +1,11 @@
 import express from "express";
 const router = express.Router();
 
-import {SendMailToUser,FindUserForChat, GetDirectPost,directPost,signin, signup, loginUser, requestOtp, requestOtpLogin, changePassword, loginviaOTP } from "../controllers/user.js";
+import {Mychats,SendMailToUser,FindUserForChat, GetDirectPost,directPost,signin, signup, loginUser, requestOtp, requestOtpLogin, changePassword, loginviaOTP } from "../controllers/user.js";
 import auth from "../middleware/auth.js";
 
 router.post("/FindUserForChat",auth,FindUserForChat);
+router.get("/Mychats",auth,Mychats);
 router.post("/direct",auth,directPost);
 router.post("/SendMailToUser",auth,SendMailToUser);
 router.post("/GETdirect",auth,GetDirectPost);

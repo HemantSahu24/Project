@@ -119,6 +119,7 @@ export const loginUser = async (req, res) => {
   const ind = await LoginModal.findOne({ email: req.body.email }).exec();
   // console.log(ind);
   if (!ind) {
+   
     var mailOptions = {
       from: 'QuickShare <quickshare56@gmail.com>',
       to: `${email}`,
@@ -133,15 +134,20 @@ export const loginUser = async (req, res) => {
         console.log('Email sent: ' + info.response);
       }
     });
-  }
-  try {
-    await LoginModal.create({ id, firstname, lastname, email, when: Date.now() });
-    res.status(201);
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong" });
 
-    console.log(error);
+    try {
+      await LoginModal.create({ id, firstname, lastname, email, when: Date.now() });
+      res.status(201);
+    } catch (error) {
+      res.status(500).json({ message: "Something went wrong" });
+  
+      console.log(error);
+    }
   }
+  else{
+    res.status(201);
+  }
+ 
 };
 
 export const requestOtpLogin = async (req, res) => {
@@ -308,6 +314,25 @@ export const SendMailToUser = async (req, res) => {
     console.log(error);
   }
 };
+
+export const Mychats= async (req, res) => {
+
+  try {
+    const User = await LoginModal.find();
+
+    if (!User) return res.status(400).json({ message: "User doesn't exists" });
+
+    res.status(201).json(User);
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+
 
 
 
