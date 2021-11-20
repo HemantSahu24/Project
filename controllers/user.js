@@ -6,6 +6,7 @@ import LoginModal from "../models/loginUsers.js"
 import nodemailer from 'nodemailer';
 import Message from '../models/message.js'
 import user from "../models/user.js";
+import Notification from "../models/notification.js";
 
 const secret = `${process.env.secret_key}`;
 const transporter = nodemailer.createTransport({
@@ -331,6 +332,88 @@ export const Mychats= async (req, res) => {
     console.log(error);
   }
 };
+
+export const AddNotification = async (req, res) => {
+  const id  = req.body.id;
+  const data=req.body.data;
+  const seen=req.body.seen
+  const newNote=new Notification({id,notification:data,seen,createdAt:Date.now()})
+  try {
+    
+   await newNote.save();
+   res.status(200).json(newNote);
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+export const FindNotification = async (req, res) => {
+  const id  = req.body.id;
+ 
+  try {
+    
+   const newNote=await Notification.find({id})
+   res.status(201).json(newNote);
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+export const ClearNotification = async (req, res) => {
+  const id  = req.body.id;
+  try{
+  const newNote=await Notification.deleteMany({id});
+  res.status(201).json(newNote);
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+export const FindUnseenNotes = async (req, res) => {
+  const id  = req.body.id;
+  try{
+  const newNote=await Notification.find({id,seen:false});
+  res.status(201).json(newNote);
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+export const SetNotesSeen = async (req, res) => {
+  const id  = req.body.id;
+  try{
+    await Notification.updateMany({ seen: false, id:id }, { $set: { seen: true } }, { new: true });
+  res.status(201).json({msg:"ok"});
+
+
+  } catch (error) {
+
+    res.status(401).json({ message: "Something went wrong" });
+    console.log(error);
+  }
+};
+
+
+
+
+
+
 
 
 
