@@ -12,6 +12,7 @@ const secret = `${process.env.secret_key}`;
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
+    type: 'OAuth2',
     user: 'quickshare56@gmail.com',
     pass: 'Quick30101997'
   }
