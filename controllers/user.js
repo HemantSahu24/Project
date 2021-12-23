@@ -196,6 +196,7 @@ export const loginviaOTP = async (req, res) => {
     };
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
+        console.log(error);
         res.status(401).send("This email id doesn't exist,try with another")
       } else {
         const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
@@ -206,6 +207,7 @@ export const loginviaOTP = async (req, res) => {
 
   }
   catch (error) {
+    console.log("error= ",error);
     res.status(401).send('Something went wrong');
   }
 }
