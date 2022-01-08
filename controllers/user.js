@@ -12,9 +12,10 @@ const secret = `${process.env.secret_key}`;
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    // type: 'OAuth2',
+    type: 'OAuth2',
     user: 'quickshare56@gmail.com',
-    pass: 'Quick30101997'
+    // pass: 'Quick30101997'
+    accessToken:'867520016821-kbj44oiflolfgpt61sqq1j2l1qeteg0d.apps.googleusercontent.com'
   }
 });
 
