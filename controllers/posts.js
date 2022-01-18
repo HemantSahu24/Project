@@ -2,13 +2,14 @@ import express from 'express';
 import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
 import PostMessage from '../models/postMessage.js';
+import dotenv from 'dotenv';
 const router = express.Router();
-
+dotenv.config();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'quickshare56@gmail.com',
-    pass: 'QUickSHaRe30101997_#*@&PaSSworD*'
+    pass: `${process.env.password}`
   }
 });
 
@@ -91,7 +92,7 @@ export const likePost = async (req, res) => {
   const post = await PostMessage.findById(id);
 
   const index = post.likes.findIndex((id) => id === String(req.userId));
-
+  console.log(index);
   if (index === -1) {
     post.likes.push(req.userId);
     var mailOptions = {
