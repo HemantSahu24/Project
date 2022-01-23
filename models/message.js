@@ -6,6 +6,7 @@ const messageSchema = mongoose.Schema({
     receiver: String,
     text:String,
     seen:Boolean,
+    replytext:String,
     createdAt: {
         type: Date,
         default: new Date(),
