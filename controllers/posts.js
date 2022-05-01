@@ -1,17 +1,35 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
+import { google } from "googleapis";
 import PostMessage from '../models/postMessage.js';
 import dotenv from 'dotenv';
 const router = express.Router();
 dotenv.config();
+const secret = `${process.env.secret_key}`;
+const CLIENT_ID = `${process.env.clientId}`;
+const CLIENT_SECRET = `${process.env.clientSecret}`;
+const REDIRECT_URL = `${process.env.RedirectUrl}`;
+const REFRESH_TOKEN=`${process.env.RefreshToken}`;
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN});
+
+const accessToken=oAuth2Client.getAccessToken();
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'quickshare56@gmail.com',
-    pass: `${process.env.password}`
+      
+    type:'OAuth2',
+    user:'quickshare56@gmail.com',
+    clientId:CLIENT_ID,
+    clientSecret:CLIENT_SECRET,
+    refreshToken:REFRESH_TOKEN,
+    accessToken:accessToken
+
   }
 });
+
 
 export const getPosts = async (req, res) => {
   try {

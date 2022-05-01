@@ -4,18 +4,32 @@ import otpGenerator from 'otp-generator'
 import UserModal from "../models/user.js";
 import LoginModal from "../models/loginUsers.js"
 import nodemailer from 'nodemailer';
+import { google } from "googleapis";
 import Message from '../models/message.js'
 import user from "../models/user.js";
 import PostMessage from "../models/postMessage.js"
 import Notification from "../models/notification.js";
 
 const secret = `${process.env.secret_key}`;
+const CLIENT_ID = `${process.env.clientId}`;
+const CLIENT_SECRET = `${process.env.clientSecret}`;
+const REDIRECT_URL = `${process.env.RedirectUrl}`;
+const REFRESH_TOKEN=`${process.env.RefreshToken}`;
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN});
+
+const accessToken=oAuth2Client.getAccessToken();
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-
-    user: 'quickshare56@gmail.com',
-    pass: `${process.env.password}`
+      
+    type:'OAuth2',
+    user:'quickshare56@gmail.com',
+    clientId:CLIENT_ID,
+    clientSecret:CLIENT_SECRET,
+    refreshToken:REFRESH_TOKEN,
+    accessToken:accessToken
 
   }
 });
@@ -430,14 +444,14 @@ export const FollowUnfollow = async (req, res) => {
       FollowerUser[0].following.push(FollowedBy);
       FollowedByUser[0].follower.push(Follower);
 
-      try{
+      try {
         var mailOptions = {
           from: 'QuickShare <quickshare56@gmail.com>',
           to: `${FollowedByUser[0].email}`,
           subject: `Someone Started Following You`,
           html: `<p>Hi ${FollowedByUser[0].firstname} ${FollowedByUser[0].lastname},</p> <p>${FollowerUser[0].firstname} ${FollowerUser[0].lastname} started following you. Check your <a href="https://hemant-sahu.netlify.app/profile/${FollowedBy}">profile</a> for more details.</p>`
         };
-    
+
         transporter.sendMail(mailOptions, function (error, info) {
           if (error) {
             console.log(error);
@@ -446,7 +460,7 @@ export const FollowUnfollow = async (req, res) => {
           }
         });
       }
-      catch(error){
+      catch (error) {
         console.log(error);
       }
 
