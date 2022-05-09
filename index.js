@@ -15,7 +15,7 @@ const corsOptions ={
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }
-app.use(cors(corsOptions));
+app.use(cors(corsOptions)); 
 app.use('/posts', postRoutes);
 app.use("/user", userRouter);
 dotenv.config();
