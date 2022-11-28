@@ -6,29 +6,29 @@ import PostMessage from '../models/postMessage.js';
 import dotenv from 'dotenv';
 const router = express.Router();
 dotenv.config();
-const secret = `${process.env.secret_key}`;
-const CLIENT_ID = `${process.env.clientId}`;
-const CLIENT_SECRET = `${process.env.clientSecret}`;
-const REDIRECT_URL = `${process.env.RedirectUrl}`;
-const REFRESH_TOKEN=`${process.env.RefreshToken}`;
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
-oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN});
+// const secret = `${process.env.secret_key}`;
+// const CLIENT_ID = `${process.env.clientId}`;
+// const CLIENT_SECRET = `${process.env.clientSecret}`;
+// const REDIRECT_URL = `${process.env.RedirectUrl}`;
+// const REFRESH_TOKEN=`${process.env.RefreshToken}`;
+// const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+// oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN});
 
-const accessToken=oAuth2Client.getAccessToken();
+// const accessToken=oAuth2Client.getAccessToken();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
       
-    type:'OAuth2',
-    user:'quickshare56@gmail.com',
-    clientId:CLIENT_ID,
-    clientSecret:CLIENT_SECRET,
-    refreshToken:REFRESH_TOKEN,
-    accessToken:accessToken
+//     type:'OAuth2',
+//     user:'quickshare56@gmail.com',
+//     clientId:CLIENT_ID,
+//     clientSecret:CLIENT_SECRET,
+//     refreshToken:REFRESH_TOKEN,
+//     accessToken:accessToken
 
-  }
-});
+//   }
+// });
 
 
 export const getPosts = async (req, res) => {
@@ -120,15 +120,15 @@ export const likePost = async (req, res) => {
       html: `<h1>Hey ${post.name} ! </h1><p><h3>${req.target} has liked❤️ your post ! This post has total ${post?.likes?.length} like(s) now.Go to <a href="https://hemant-sahu.netlify.app/${post._id}">your post</a> and check what's happening there ! </h3></p>`
     };
 
-    if (post.creator != req.userId) {
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-    }
+    // if (post.creator != req.userId) {
+    //   transporter.sendMail(mailOptions, function (error, info) {
+    //     if (error) {
+    //       console.log(error);
+    //     } else {
+    //       console.log('Email sent: ' + info.response);
+    //     }
+    //   });
+    // }
 
   } else {
     post.likes = post.likes.filter((id) => id !== String(req.userId));
@@ -138,15 +138,15 @@ export const likePost = async (req, res) => {
       subject: `NOTIFICATION: Someone has unliked your post !`,
       html: `<h1>Hey ${post.name} ! </h1><p><h3>${req.target} has unliked💔 your post ! This post has total ${post?.likes?.length} like(s) now.Go to <a href="https://hemant-sahu.netlify.app/${post._id}">your post</a> and check what's happening there ! </h3></p>`
     };
-    if (post.creator != req.userId) {
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-    }
+    // if (post.creator != req.userId) {
+    //   transporter.sendMail(mailOptions, function (error, info) {
+    //     if (error) {
+    //       console.log(error);
+    //     } else {
+    //       console.log('Email sent: ' + info.response);
+    //     }
+    //   });
+    // }
 
   }
   const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
@@ -170,15 +170,15 @@ export const commentPost = async (req, res) => {
 
 
     post.comments.push(value);
-    if (post.creator != req.userId) {
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('Email sent: ' + info.response);
-        }
-      });
-    }
+    // if (post.creator != req.userId) {
+    //   transporter.sendMail(mailOptions, function (error, info) {
+    //     if (error) {
+    //       console.log(error);
+    //     } else {
+    //       console.log('Email sent: ' + info.response);
+    //     }
+    //   });
+    // }
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
 
     res.json(updatedPost);
