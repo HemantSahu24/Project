@@ -10,29 +10,29 @@ import user from "../models/user.js";
 import PostMessage from "../models/postMessage.js"
 import Notification from "../models/notification.js";
 
-const secret = `${process.env.secret_key}`;
-const CLIENT_ID = `${process.env.clientId}`;
-const CLIENT_SECRET = `${process.env.clientSecret}`;
-const REDIRECT_URL = `${process.env.RedirectUrl}`;
-const REFRESH_TOKEN=`${process.env.RefreshToken}`;
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
-oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN});
+// const secret = `${process.env.secret_key}`;
+// const CLIENT_ID = `${process.env.clientId}`;
+// const CLIENT_SECRET = `${process.env.clientSecret}`;
+// const REDIRECT_URL = `${process.env.RedirectUrl}`;
+// const REFRESH_TOKEN=`${process.env.RefreshToken}`;
+// const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL);
+// oAuth2Client.setCredentials({refresh_token:REFRESH_TOKEN});
 
-const accessToken=oAuth2Client.getAccessToken();
+// const accessToken=oAuth2Client.getAccessToken();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
+// const transporter = nodemailer.createTransport({
+//   service: 'gmail',
+//   auth: {
       
-    type:'OAuth2',
-    user:'quickshare56@gmail.com',
-    clientId:CLIENT_ID,
-    clientSecret:CLIENT_SECRET,
-    refreshToken:REFRESH_TOKEN,
-    accessToken:accessToken
+//     type:'OAuth2',
+//     user:'quickshare56@gmail.com',
+//     clientId:CLIENT_ID,
+//     clientSecret:CLIENT_SECRET,
+//     refreshToken:REFRESH_TOKEN,
+//     accessToken:accessToken
 
-  }
-});
+//   }
+// });
 
 export const requestOtp = async (req, res) => {
   const op = otpGenerator.generate(4, { alphabets: false, digits: true, upperCase: false, specialChars: false });
@@ -41,20 +41,20 @@ export const requestOtp = async (req, res) => {
     const oldUser = await UserModal.findOne({ email: req.body.email });
 
     if (oldUser) return res.status(400).json({ message: "User already exists" });
-    var mailOptions = {
-      from: 'QuickShare <quickshare56@gmail.com>',
-      to: `${req.body.email}`,
-      subject: `QuickShare Email Verification`,
-      html: `<p>Hi,</p> <p> Your OTP for verifying email on QuickShare is ${op}.</p>`
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        res.status(401).send("This email id doesn't exist,try with another")
-      } else {
-        res.status(200).send(op);
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // var mailOptions = {
+    //   from: 'QuickShare <quickshare56@gmail.com>',
+    //   to: `${req.body.email}`,
+    //   subject: `QuickShare Email Verification`,
+    //   html: `<p>Hi,</p> <p> Your OTP for verifying email on QuickShare is ${op}.</p>`
+    // };
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     res.status(401).send("This email id doesn't exist,try with another")
+    //   } else {
+    //     res.status(200).send(op);
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
 
   }
   catch (error) {
@@ -102,20 +102,20 @@ export const signup = async (req, res) => {
     const result = await UserModal.create({ email, password: hashedPassword, name: `${firstName} ${lastName}` });
 
     const token = jwt.sign({ email: result.email, id: result._id }, secret, { expiresIn: "1h" });
-    var mailOptions = {
-      from: 'QuickShare <quickshare56@gmail.com>',
-      to: `${email}`,
-      subject: `Welcome To QuickShare`,
-      html: `<p>Hi ${firstName},</p> <p> Thank you for registering on QuickShare.Create memories and start sharing on QuickShare.</p>`
-    };
+    // var mailOptions = {
+    //   from: 'QuickShare <quickshare56@gmail.com>',
+    //   to: `${email}`,
+    //   subject: `Welcome To QuickShare`,
+    //   html: `<p>Hi ${firstName},</p> <p> Thank you for registering on QuickShare.Create memories and start sharing on QuickShare.</p>`
+    // };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     console.log(error);
+    //   } else {
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
     const id = result._id;
     await LoginModal.create({ id, firstname: firstName, lastname: lastName, email, when: Date.now() });
     res.status(201).json({ result, token });
@@ -138,20 +138,20 @@ export const loginUser = async (req, res) => {
   // console.log(ind);
   if (!ind) {
 
-    var mailOptions = {
-      from: 'QuickShare <quickshare56@gmail.com>',
-      to: `${email}`,
-      subject: `Welcome To QuickShare`,
-      html: `<p>Hi ${firstname} ${lastname},</p> <p> QuickShare warmly welcomes you.Create memories and start sharing on QuickShare.</p>`
-    };
+    // var mailOptions = {
+    //   from: 'QuickShare <quickshare56@gmail.com>',
+    //   to: `${email}`,
+    //   subject: `Welcome To QuickShare`,
+    //   html: `<p>Hi ${firstname} ${lastname},</p> <p> QuickShare warmly welcomes you.Create memories and start sharing on QuickShare.</p>`
+    // };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     console.log(error);
+    //   } else {
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
 
     try {
       await LoginModal.create({ id, firstname, lastname, email, when: Date.now() });
@@ -176,20 +176,20 @@ export const requestOtpLogin = async (req, res) => {
     // console.log(oldUser);
     if (!oldUser) return res.status(400).json({ message: "User doesn't exist" });
 
-    var mailOptions = {
-      from: 'QuickShare <quickshare56@gmail.com>',
-      to: `${req.body.email}`,
-      subject: `QuickShare Change Password`,
-      html: `<p>Hi ${oldUser.name},</p> <p> Your OTP for changing password on QuickShare is ${op}.</p>`
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        res.status(401).send("This email id doesn't exist,try with another")
-      } else {
-        res.status(200).send(op);
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // var mailOptions = {
+    //   from: 'QuickShare <quickshare56@gmail.com>',
+    //   to: `${req.body.email}`,
+    //   subject: `QuickShare Change Password`,
+    //   html: `<p>Hi ${oldUser.name},</p> <p> Your OTP for changing password on QuickShare is ${op}.</p>`
+    // };
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     res.status(401).send("This email id doesn't exist,try with another")
+    //   } else {
+    //     res.status(200).send(op);
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
 
   }
   catch (error) {
@@ -205,22 +205,22 @@ export const loginviaOTP = async (req, res) => {
     // console.log(oldUser);
     if (!oldUser) return res.status(401).json({ message: "User doesn't exist" });
 
-    var mailOptions = {
-      from: 'QuickShare <quickshare56@gmail.com>',
-      to: `${req.body.email}`,
-      subject: `Login Via OTP`,
-      html: `<p>Hi ${oldUser.name},</p> <p>${op} is your QuickShare verification code.</p>`
-    };
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-        res.status(401).send("This email id doesn't exist,try with another")
-      } else {
-        const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
-        res.status(200).json({ token, OneTimePassword: op, UserResult: oldUser });
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // var mailOptions = {
+    //   from: 'QuickShare <quickshare56@gmail.com>',
+    //   to: `${req.body.email}`,
+    //   subject: `Login Via OTP`,
+    //   html: `<p>Hi ${oldUser.name},</p> <p>${op} is your QuickShare verification code.</p>`
+    // };
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     console.log(error);
+    //     res.status(401).send("This email id doesn't exist,try with another")
+    //   } else {
+    //     const token = jwt.sign({ email: oldUser.email, id: oldUser._id }, secret, { expiresIn: "1h" });
+    //     res.status(200).json({ token, OneTimePassword: op, UserResult: oldUser });
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
 
   }
   catch (error) {
@@ -312,20 +312,20 @@ export const SendMailToUser = async (req, res) => {
 
     if (!User) return res.status(400).json({ message: "User doesn't exists" });
 
-    var mailOptions = {
-      from: 'QuickShare <quickshare56@gmail.com>',
-      to: `${User?.email}`,
-      subject: `Someone sent you a message`,
-      html: `<p>Hi ${User.firstname} ${User.lastname},</p> <p>${Name} sent you a message "${msg}". Click <a href="https://hemant-sahu.netlify.app/direct/${senderId}">here</a> for more details.</p>`
-    };
+    // var mailOptions = {
+    //   from: 'QuickShare <quickshare56@gmail.com>',
+    //   to: `${User?.email}`,
+    //   subject: `Someone sent you a message`,
+    //   html: `<p>Hi ${User.firstname} ${User.lastname},</p> <p>${Name} sent you a message "${msg}". Click <a href="https://hemant-sahu.netlify.app/direct/${senderId}">here</a> for more details.</p>`
+    // };
 
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-      }
-    });
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //   if (error) {
+    //     console.log(error);
+    //   } else {
+    //     console.log('Email sent: ' + info.response);
+    //   }
+    // });
 
   } catch (error) {
 
@@ -445,20 +445,20 @@ export const FollowUnfollow = async (req, res) => {
       FollowedByUser[0].follower.push(Follower);
 
       try {
-        var mailOptions = {
-          from: 'QuickShare <quickshare56@gmail.com>',
-          to: `${FollowedByUser[0].email}`,
-          subject: `Someone Started Following You`,
-          html: `<p>Hi ${FollowedByUser[0].firstname} ${FollowedByUser[0].lastname},</p> <p>${FollowerUser[0].firstname} ${FollowerUser[0].lastname} started following you. Check your <a href="https://hemant-sahu.netlify.app/profile/${FollowedBy}">profile</a> for more details.</p>`
-        };
+        // var mailOptions = {
+        //   from: 'QuickShare <quickshare56@gmail.com>',
+        //   to: `${FollowedByUser[0].email}`,
+        //   subject: `Someone Started Following You`,
+        //   html: `<p>Hi ${FollowedByUser[0].firstname} ${FollowedByUser[0].lastname},</p> <p>${FollowerUser[0].firstname} ${FollowerUser[0].lastname} started following you. Check your <a href="https://hemant-sahu.netlify.app/profile/${FollowedBy}">profile</a> for more details.</p>`
+        // };
 
-        transporter.sendMail(mailOptions, function (error, info) {
-          if (error) {
-            console.log(error);
-          } else {
-            console.log('Email sent: ' + info.response);
-          }
-        });
+        // transporter.sendMail(mailOptions, function (error, info) {
+        //   if (error) {
+        //     console.log(error);
+        //   } else {
+        //     console.log('Email sent: ' + info.response);
+        //   }
+        // });
       }
       catch (error) {
         console.log(error);
