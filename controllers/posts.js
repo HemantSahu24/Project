@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import nodemailer from 'nodemailer';
 import { google } from "googleapis";
 import PostMessage from '../models/postMessage.js';
+import Messages from '../models/Messages.js';
 import dotenv from 'dotenv';
 const router = express.Router();
 dotenv.config();
@@ -60,7 +61,37 @@ export const getPost = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 }
+export const getMsgs = async (req, res) => {
 
+  try {
+    const msgs = await Messages.find();
+
+    res.status(200).json(msgs);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
+export const postMsg = async (req, res) => {
+
+  const text = req.body.text;
+  console.log(text);
+  const Message=new Messages({text:text})
+  try {
+     await Message.save();
+     res.status(201).json("msg sent !");
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
+export const deleteMsg = async (req, res) => {
+ 
+  try {
+     await Messages.deleteMany();
+     res.status(201).json("Deleted !");
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+}
 export const createPost = async (req, res) => {
   const post = req.body;
 

@@ -24,7 +24,7 @@ dotenv.config();
 const PORT = process.env.PORT || 7000
 
 
-mongoose.connect(process.env.con_url,
+mongoose.connect("mongodb+srv://My-proj:vLdrF9ZcEHqeSaG@myproj.bqul5.mongodb.net/TempProj?retryWrites=true&w=majority",
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
